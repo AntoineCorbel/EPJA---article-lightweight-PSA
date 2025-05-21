@@ -42,6 +42,7 @@ grestore
 \usepackage{makecell}
 \usepackage{threeparttable}
 \usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage{placeins}
 % \usepackage[sorting=none]{biblatex}
 % \bibliography{biblio}
 \usepackage{graphics}
@@ -320,7 +321,7 @@ An early-stopping criterion is used to stop the training after 10 new trees with
 % \end{table}
 \subsection{Feature importance}
 
-To understand how input features impact the target prediction, SHAP (Shapley Additive exPlanations) method is used~\cite{lundberg2017}. For a chosen subset of points from the test-set (100 in this work, enough to see patterns in the feature importance graphs), predictions are recomputed by removing one feature from the input set and observing how the prediction is affected. It gives insights on the model that was trained and the importance of each feature. \textbf{Fig.}~\ref{fig:detph_treeSHAP} presents the prediction of $z$, the depth of the interaction, for all features of the model and the impact of each feature's value on the prediction.
+To understand how input features impact the target prediction, SHAP (Shapley Additive exPlanations) method is used~\cite{lundberg2017}. For a chosen subset of points from the test-set (100 in this work, enough to see patterns in the feature importance graphs), predictions are recomputed by removing one feature from the input set and observing how the prediction is affected. It gives insights on the model that was trained and the importance of each feature. \textbf{Fig.}~\ref{fig:detph_treeSHAP} presents the feature importance graph of $z$, the depth of the interaction, for all features of the model and the impact of each feature's value on the prediction.
 
 \begin{figure}
 \centering
@@ -506,7 +507,7 @@ Theta (rad) & $-0.187(4)$ & $-0.150(6)$ \\
 \end{tabular}
 \end{table}
 
-In order to characterize the position reconstruction in the whole cristal, \textbf{Table} \ref{tab:gauss_fit_all_slices} presents, for 3 points per slice, the gaussian fit parameters obtained for both fold-1 and -2, as shown in \textbf{Fig.} \ref{fig:H_beam_10.0_-9.0_fold2_HitIndex1_and_fold1}(c) and (f), respectively. Each beam spot is taken at approximately the middle of the slices along \textbf{Z\textsubscript{c}} $(4, 14, 28, 44, 62, 80)$ mm, at three \textbf{X\textsubscript{c}} positions : $(-19, 1, 21)$ mm. This results in 18 points in the volume of the crystal. Again, for fold-2 events reconstruction, the gaussian fit is only performed on the supposed first interaction of the pair.
+In order to characterize the position reconstruction in the whole cristal, \textbf{Table}~\ref{tab:gauss_fit_all_slices} presents, for 3 points per slice, the gaussian fit parameters obtained for both fold-1 and -2, using the same method as in \textbf{Fig.}~\ref{fig:H_beam_10.0_-9.0_fold2_HitIndex1_and_fold1}(c) and (f), respectively. Each beam spot is taken at approximately the middle of the slices along \textbf{Z\textsubscript{c}} $(4, 14, 28, 44, 62, 80)$ mm, at three \textbf{X\textsubscript{c}} positions : $(-19, 1, 21)$ mm. This results in 18 points in the volume of the crystal. Again, for fold-2 events reconstruction, the gaussian fit is only performed on the supposed first interaction of the pair.
 
 
 % \begin{table*}[ht]
@@ -531,7 +532,7 @@ In order to characterize the position reconstruction in the whole cristal, \text
 
 
 \begin{table*}[h]
-  \caption{Gaussian fit parameters for 3 \textbf{X\textsubscript{c}} positions $(-19, 1, 20)$ mm across all slices of the detector, along \textbf{Z\textsubscript{c}}. Positions along \textbf{Z\textsubscript{c}} are taken at the center of each slice, at coordinates $(4, 14, 28, 44, 62, 80)$ mm.}
+  \caption{Gaussian fit parameters for 3 \textbf{X\textsubscript{c}} positions $(-19, 1, 20)$ mm across all slices of the detector, along \textbf{Z\textsubscript{c}}. Positions along \textbf{Z\textsubscript{c}} are taken at the center of each slice, at coordinates $(4, 14, 28, 44, 62, 80)$ mm. Results are given for both fold-1 (\textbf{F1}) and fold-2 (\textbf{F2}) events. Fit parameters uncertainty is omitted as it is always lower than 1\% of the parameter's value.}
   \label{tab:gauss_fit_all_slices}
   \centering
   \begin{threeparttable}
@@ -547,31 +548,28 @@ In order to characterize the position reconstruction in the whole cristal, \text
       \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11} \cmidrule(lr){12-13}
       & \tabhead{F1\tnote{1}} & \tabhead{F2\tnote{2}} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} \\
       \midrule
-      \multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = 21 mm}}}}} 
+      \multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = 21 mm}}}}} \\
       Amplitude          & 143.32 & 12.96  & 145.53 & 17.68  & 174.77 & 18.77 & 205.96 & 19.62 & 217.98 & 25.22 & 137.92 & 9.51 \\
       Mean Z\textsubscript{c} (mm)      & 4.03   & 3.97   & 14.18  & 14.95  & 28.88  & 28.53 & 43.69  & 43.92 & 61.26  & 61.05 & 79.14  & 77.03 \\
       $\sigma_Z$ (mm)    & 1.43   & 2.08   & 2.01   & 2.36   & 1.92   & 2.54  & 1.72   & 2.49  & 1.65   & 2.06  & 2.51   & 2.78 \\
       Mean X\textsubscript{c} (mm)      & 20.60  & 20.62  & 20.71  & 20.28  & 20.24  & 19.40 & 20.46  & 19.01 & 19.98  & 18.57 & 20.25  & 19.60 \\
       $\sigma_X$ (mm)    & 2.56   & 3.24   & 1.93   & 4.04   & 2.39   & 3.85  & 2.58   & 3.57  & 2.81   & 3.00  & 3.18   & 4.63 \\
-      \\
       % Theta (rad)        & -0.44  & -0.31  & 1.57   & -0.09  & 0.21   & 0.10  & 0.03   & -0.02 & 0.00   & 0.04  & 0.45   & 1.57 \\
       \midrule
-      \multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = 1 mm}}}}} 
+      \multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = 1 mm}}}}} \\
       Amplitude          & 264.47 & 38.17  & 125.03 & 52.91  & 215.48 & 36.09 & 283.42 & 44.23 & 344.86 & 48.57 & 203.91 & 9.66 \\
       Mean Z\textsubscript{c} (mm)      & 3.91   & 4.88   & 15.19  & 15.12  & 29.91  & 29.44 & 44.08  & 44.40 & 61.30  & 61.52 & 78.76  & 77.68 \\
       $\sigma_Z$ (mm)    & 1.93   & 2.10   & 1.65   & 2.76   & 2.71   & 2.68  & 1.65   & 2.02  & 1.51   & 1.87  & 2.60   & 4.47 \\
       Mean X\textsubscript{c} (mm)      & 2.76   & 2.99   & 3.37   & 3.20   & 3.93   & 4.00  & 4.12   & 4.14  & 3.62   & 3.79  & 3.47   & 4.26 \\
       $\sigma_X$ (mm)    & 1.86   & 2.99   & 2.99   & 1.50   & 1.80   & 2.89  & 2.33   & 2.64  & 2.04   & 2.45  & 2.03   & 4.76 \\
-      \\
       % Theta (rad)        & -1.57  & 1.26   & -0.68  & -1.57  & -1.57  & 1.57  & 0.28   & 0.09  & 0.10   & -0.02 & -0.31  & 1.57 \\
       \midrule
-      \multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = -19 mm}}}}} 
+      \multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = -19 mm}}}}} \\
       Amplitude          & 210.85 & 17.95  & 224.48 & 40.82  & 226.66 & 34.44 & 264.63 & 43.81 & 327.78 & 42.40 & 228.86 & 15.64 \\
       Mean Z\textsubscript{c} (mm)      & 4.09   & 3.97   & 13.84  & 14.84  & 27.67  & 27.78 & 43.53  & 43.76 & 61.69  & 61.39 & 79.34  & 77.69 \\
       $\sigma_Z$ (mm)    & 1.18   & 1.73   & 1.90   & 1.84   & 1.57   & 2.30  & 1.56   & 1.93  & 1.44   & 1.80  & 2.30   & 4.42 \\
       Mean X\textsubscript{c} (mm)      & -17.10 & -16.94 & -17.83 & -17.13 & -16.53 & -17.54 & -17.30 & -17.26 & -16.85 & -16.55 & -17.63 & -17.41 \\
       $\sigma_X$ (mm)    & 2.87   & 4.56   & 2.02   & 3.15   & 3.56   & 3.52  & 2.89   & 2.63  & 2.93   & 2.93  & 2.62   & 2.54 \\
-      \\
       % Theta (rad)        & 0.07   & 0.11   & -0.01  & -0.14  & 0.05   & -0.03 & 0.05   & -0.02 & -0.02  & 0.07  & 0.98   & 0.02 \\
       \bottomrule
     \end{tabular}
@@ -585,9 +583,10 @@ In order to characterize the position reconstruction in the whole cristal, \text
 \section{Conclusion}
 Training an ensemble machine learning model on features extracted from pulses recorded on an AGATA detector, this work shows that a millimetric position reconstruction is possible by using features extracted from the pulses, without the use of grid-search or adaptative grid-search algorithms.
 
-Models were combined and tested on the test-set, resulting in a 3D euclidean error of 1.88 mm. Their performance was also evaluated on a collimated beam of 662 keV $\gamma$ rays from a $^{137}$Cs source, both for fold-1 and 2 events with full-energy deposition, showing robustness of the method with features extracted from noisy pulses compared to what the model was trained with.
+Models were combined and tested on the test-set, resulting in a 3D euclidean error of 1.88 mm. Their performance was also evaluated on a collimated beam of 662~keV $\gamma$ rays from a $^{137}$Cs source, both for fold-1 and -2 events with full~-energy deposition, showing robustness of the method with features extracted from noisy pulses compared to what the model was trained with. Fold-2 reconstruction enables performing Compton imaging using this method.
 
 The parameter $\varphi$ was reconstructed from two independent models, the correctness of the identity \ensuremath{\sin^2 \varphi + \cos^2 \varphi = 1} was not enforced. While this is a limitation of current approach, this does not seem to prevent a correct hit azimuthal position reconstruction.
+Further research could also focus on optimizing the feature set and exploring alternative machine learning architectures, such as neural networks.
 %
 % For two-column wide figures use
 % \begin{figure*}
@@ -605,6 +604,8 @@ The parameter $\varphi$ was reconstructed from two independent models, the corre
 \label{sec:acknowledgements}
 The authors are grateful for the important technical contributions of M.-H. Sigward, M. Filliger and F. Didierjean. The authors acknowledge support from Région Grand-Est and MIRION Technologies CANBERRA, Contracts N$^\circ$\,252911 and 260587, respectively.
 
+% \clearpage
+\FloatBarrier
 %
 % BibTeX users please use
 \bibliographystyle{unsrt}
