@@ -40,6 +40,7 @@ grestore
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{makecell}
+\usepackage{textcomp}
 \usepackage{threeparttable}
 \usepackage[linesnumbered,ruled,vlined]{algorithm2e}
 \usepackage{placeins}
@@ -63,13 +64,13 @@ grestore
 %
 % \offprints{}          % Insert a name or remove this line
 %
-\institute{Université de Strasbourg, CNRS, IPHC UMR 7178, F-67000 Strasbourg, France \and Mirion Technologies CANBERRA (SAS), Lingolsheim, France}
+\institute{Université de Strasbourg, CNRS, IPHC UMR 7178, F-67000 Strasbourg, France \and Mirion Technologies (Canberra) SAS, Lingolsheim, France}
 %
 \date{Received: date / Revised version: date}
 % The correct dates will be entered by Springer
 %
 \abstract{
-Pulse-shape analysis (PSA) techniques are widely used with segmented HPGe detectors for $\gamma$-ray tracking purposes, such as in the AGATA (Advanced GAmma Tracking Array) collaboration. It utilizes a simulated basis of pulses taking advantage of the position sensitivity of segmented HPGe detectors to determine the interaction position, which is needed for $\gamma$-ray tracking and Doppler correction. The typical approach of PSA is computationally expensive and thus incompatible with embedded electronics such as a moderate-spec laptop. This work presents an algorithm using an ensemble machine learning model, gradient boosted regression trees, to reconstruct the 3D position of an interaction based on features extracted from its pulse, such as rise time and transient signal integrals. Construction and training of the models is presented as well as performance evaluation on a collimated beam of $^{137}$Cs at 662 keV, events being reconstructed both at fold-1 and 2 (single and double-hit events, respectively), in a 36-fold segmented AGATA detector.
+Pulse-shape analysis (PSA) techniques are widely used with segmented HPGe detectors for $\gamma$-ray tracking purposes, such as in the AGATA (Advanced GAmma Tracking Array) collaboration. It utilizes a simulated basis of pulses taking advantage of the position sensitivity of segmented HPGe detectors to determine the interaction position, which is needed for $\gamma$-ray tracking and Doppler correction. The typical approach of PSA is computationally expensive and thus incompatible with embedded electronics such as a moderate-spec laptop. This work presents an algorithm using an ensemble machine learning model, gradient boosted regression trees, to reconstruct the 3D position of an interaction based on features extracted from its pulse, such as rise time and transient signal integrals. Construction and training of the models is presented as well as performance evaluation on a collimated gamma-ray beam of $^{137}$Cs at 662 keV, events being reconstructed both at fold-1 and 2 (single and double-hit events, respectively), in a 36-fold segmented AGATA detector.
 %
 \PACS{
       {AGATA spectrometer:} {gamma-ray tracking array for nuclear physics};
@@ -80,16 +81,16 @@ Pulse-shape analysis (PSA) techniques are widely used with segmented HPGe detect
 } %end of abstract
 %
 \authorrunning{Corbel A.}
-\titlerunning{Ligthweight PSA machine learning model}
+\titlerunning{Lightweight PSA machine learning model}
 \maketitle
 %
 \section{Introduction}
 \label{sec:intro}
-In state-of-the-art HPGe segmented detectors, such as in international collaborations Advanced GAmma Tracking Array (AGATA)~\cite{Akkoyun2012} and Gamma-Ray Energy Tracking Array (GRETA)~\cite{Lee2003DevelopmentsArrays}, the interaction position of the $\gamma$-ray can be determined from the signal pulse in the hit segment and transient pulses in the neighbouring segments (see \textbf{Fig.}~\ref{fig:a005_geometry} for segmentation pattern). The $\gamma$-ray interaction positions and energy deposits are used by tracking algorithms~\cite{Bazzacco:2004nnw,Lopez-Martens2004}  to determine the Compton sequencing of the photon inside the detector. The approach followed by the AGATA collaboration was so far to simulate, using the AGATA Data Library (ADL)~\cite{Bruyneel2006,Bruyneel2006-2,BruyneelUnpub}, a basis of pulses associated to positions on a 2~mm Cartesian grid in the 3D volume of the germanium detector. The experimentally measured signal is then compared to the basis to determine the interaction position.
+In state-of-the-art HPGe segmented detectors, such as in international collaborations Advanced GAmma Tracking Array (AGATA)~\cite{Akkoyun2012} and Gamma-Ray Energy Tracking Array (GRETA)~\cite{Lee2003DevelopmentsArrays}, the interaction position of the $\gamma$-ray can be determined from the signal pulse in the hit segment and transient pulses in the neighbouring segments (see \textbf{Fig.}~\ref{fig:a005_geometry} for AGATA segmentation pattern). The $\gamma$-ray interaction positions and energy deposits are used by tracking algorithms~\cite{Bazzacco:2004nnw,Lopez-Martens2004}  to determine the Compton sequencing of the photon inside the detector. The approach followed by the AGATA collaboration was so far to simulate, using the AGATA Data Library (ADL)~\cite{Bruyneel2016ADL}, a basis of pulses associated to positions on a 2~mm Cartesian grid in the 3D volume of the germanium detector. The experimentally measured signal is then compared to the basis to determine the interaction position.
 
-The present work uses a 3D scanned basis built with data from the IPHC scanning table and the Pulse-Shape Comparison Scan (PSCS) method~\cite{Crespi2008}. Instead of comparing the super-pulses~\cite{}, the approach presented in this paper uses a subset of features extracted from the pulses to locate the $\gamma$-ray interaction. Multiple gradient boosting models are trained on the features of the scanned 3D basis and takes as inputs features from measured pulses, to predict the interaction position.
+The present work uses a 3D scanned basis built with data from the IPHC scanning table and the Pulse-Shape Comparison Scan (PSCS) method~\cite{Crespi2008}. Instead of comparing the super-pulses, the approach presented in this paper uses a subset of features extracted from the pulses to locate the $\gamma$-ray interaction. Multiple gradient boosting models are trained on the features of the scanned 3D basis and takes as inputs features from measured pulses, to predict the interaction position.
 
-After introducing the dataset in \textbf{Section} \ref{sec:dataset_building}, the model and its training is presented in \textbf{Section }\ref{sec:models_training}. Model evaluation is performed in \textbf{Section} \ref{sec:results} and position reconstruction results, evaluated using pulses of an unseen dataset, from interactions of a collimated beam of 662 keV $\gamma$-rays in an AGATA crystal, are shown in \textbf{Section} \ref{sec:position_reconstruction}.
+After introducing the dataset in \textbf{Section} \ref{sec:dataset_building}, the model and its training is presented in \textbf{Section }\ref{sec:models_training}. Model evaluation is performed in \textbf{Section} \ref{sec:results}. Position reconstruction results, evaluated using pulses of an unseen dataset, from interactions of a collimated beam of 662 keV $\gamma$-rays in an AGATA crystal, are shown in \textbf{Section} \ref{sec:position_reconstruction}.
 
 \section{Dataset building}
 \label{sec:dataset_building}
@@ -104,7 +105,7 @@ The dataset used in this work was generated from the IPHC scanning table, that u
 \label{fig:a005_geometry}
 \end{figure}
 
-Both scans were calibrated and gain matched to ensure pulses of both scans could be compared with $\chi^2$ minimisation method, see~\cite{DeCanditiis2020SimulationsDetector} for details. A gate of 3 keV around the 661.7 keV photoelectric peak of $^{137}$Cs was applied to compare full-energy deposition pulses. Due to the position sensitivity of HPGe detectors, pulses will differ between vertical and horizontal scans except at crossing points. Crossing both scan grids allows to reconstruct a pulse for all 36 segments of the detector and the core contact, at 47 000 positions. 
+Both scans were calibrated and gain matched to ensure pulses of both scans could be compared with $\chi^2$ minimization method, see~\cite{DeCanditiis2020SimulationsDetector} for details. A gate of 3 keV around the 661.7 keV photoelectric peak of $^{137}$Cs was applied to compare full-energy deposition pulses. Due to the position sensitivity of HPGe detectors, pulses will differ between vertical and horizontal scans except at crossing points. Crossing both scan grids allows to reconstruct a pulse for all 36 segments of the detector and the core contact, at 47 000 positions. 
 
 The pitch of both scans being 2~mm results in an equally 2~mm spaced points in the 3D basis, along all cartesian axes.
 
@@ -141,7 +142,7 @@ The pitch of both scans being 2~mm results in an equally 2~mm spaced points in t
 \subsection{Features extraction}
 \label{subsec:feature_extraction}
 
-Instead of utilizing a performant but computationally intensive grid-search algorithm (or the adaptative grid-search algorithm) as used in AGATA~\cite{Venturelli2004}, relevant features are extracted from the pulses of the hit segment, its four closest neighbors (top, down, left and right) and the core, providing the model enough information on the position of the interaction in the detector volume. The aim is to use a lighter PSA method, to allow usage of the model on an embedded software. Given the quasi-rotational symmetry of A005 (the crystal is asymmetric), a cylindrical coordinate system $(r, \varphi, z)$ is adopted.
+Instead of utilizing a performant but computationally intensive grid-search algorithm (or the adaptative grid-search algorithm) as used in AGATA~\cite{Venturelli2004}, relevant features are extracted from the pulses of the hit segment, its four closest neighbors (top, down, left and right) and the core, providing the model enough information on the position of the interaction in the detector volume. The aim is to use a lighter Pulse Shape Analysis (PSA) method, to allow usage of the model on an embedded software. Given the quasi-rotational symmetry of A005 (the crystal is asymmetric), a cylindrical coordinate system $(r, \varphi, z)$ is adopted.
 
 The first feature that is used is the segment ID of the hit segment (named \textit{SegID}). A005 having 36 segments, this information alone refines the position to a few cm$^3$. To bring additional depth information, the slice number (named \textit{SliceID}) illustrated in \textbf{Fig.}~\ref{fig:a005_geometry}(a) is also used as a feature.
 
@@ -210,7 +211,7 @@ Regression trees work by recursively partitioning the feature space based on fea
 where $Y_{i}$ and $\hat {Y_{i}}$ are the expected (true) and the predicted values, respectively.
 
 
-This partition splits the feature space into two distinct regions that can be further partitioned. Each partition adds depth to the regression tree, making it more complex. Parameters such as tree depth, minimum samples to split a node (M\textsubscript{S}) or minimum samples in a leaf (M\textsubscript{L}), shown in \textbf{Fig.}~\ref{fig:regression_tree}, can help reduce the complexity of a tree by limiting its ability to create too specific partitions. 
+This partition splits the feature space into two distinct regions that can be further partitioned. Each partition adds depth to the regression tree, making it more complex. Parameters such as maximum tree depth, minimum samples to split a node (M\textsubscript{S}) or minimum samples in a leaf (M\textsubscript{L}), shown in \textbf{Fig.}~\ref{fig:regression_tree}, can help reduce the complexity of a tree by limiting its ability to create too specific partitions. 
 
 \begin{figure}
 \centering
@@ -221,7 +222,7 @@ This partition splits the feature space into two distinct regions that can be fu
 \label{fig:regression_tree}
 \end{figure}
 
-A leaf is a node of the tree that does not have sub-partitions. However, even with tuned parameters, standalone regression trees are prone to overfitting and may not generalize to unseen data.
+A leaf is a node of the tree that does not have sub-partitions. However, even with tuned parameters, standalone regression trees are prone to overfitting and may not generalize to unseen data \cite{hastie01statisticallearning}.
 
 \subsection{Gradient boosted regression trees}
 
@@ -264,7 +265,7 @@ Training curves are used to monitor the performance of the GBRT models during th
 
 An early-stopping criterion is used to stop the training after 10 new trees without improvement of the loss function on the validation set, further limiting the risk of overfitting.
 % % For one-column wide figures use
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \resizebox{0.48\textwidth}{!}{%
   \includegraphics{images/gbdt_losses.eps}
@@ -321,7 +322,7 @@ An early-stopping criterion is used to stop the training after 10 new trees with
 % \end{table}
 \subsection{Feature importance}
 
-To understand how input features impact the target prediction, SHAP (Shapley Additive exPlanations) method is used~\cite{lundberg2017}. For a chosen subset of points from the test-set (100 in this work, enough to see patterns in the feature importance graphs), predictions are recomputed by removing one feature from the input set and observing how the prediction is affected. It gives insights on the model that was trained and the importance of each feature. \textbf{Fig.}~\ref{fig:detph_treeSHAP} presents the feature importance graph of $z$, the depth of the interaction, for all features of the model and the impact of each feature's value on the prediction.
+To understand how input features impact the target prediction, SHAP (Shapley Additive exPlanations) method is used~\cite{lundberg2017}. For a chosen subset of points from the test set (100 in this work, enough to see patterns in the feature importance graphs), predictions are recomputed by removing one feature from the input set and observing how the prediction is affected. It gives insights on the model that was trained and the importance of each feature. \textbf{Fig.}~\ref{fig:detph_treeSHAP} presents the feature importance graph of $z$, the depth of the interaction, for all features of the model and the impact of each feature's value on the prediction.
 
 \begin{figure}
 \centering
@@ -347,23 +348,23 @@ The feature \textit{DownPolarity} has the most impact on the predictions of the 
 
 % Using Shapley values~\cite{Lundberg2018}, it is possible to understand what features were the most important for a good prediction of the model. On a random sample of the test set, models are predicting their target variable with and without a specific feature of the set. The predictions are then compared and the impact of this specific feature can be quantified.
 
-\section{Test-set and real-case results}
+\section{Test set and real-case results}
 \label{sec:results}
 \subsubsection*{\underline{Models residuals}}
 
-After training the model, it is evaluated on the test-set, constituting 10\% of the total dataset that the model has not seen during the training phase. The residuals are computed as $\sum_{i=1}^n Y_i - \hat Y_i$ 
-with $n$ the number of samples of the test-set. \textbf{Fig.}~\ref{fig:all_residuals} gathers $[r, \varphi,z]$ residuals after recombination of $\varphi$ from $\sin \varphi$ and $\cos \varphi$ using \textbf{eq.} \ref{eq:atan2} and conversion from radians to degrees. \textbf{Table}~\ref{tab:rmse_metrics} gives the RMSE value for both training and testing sets.
+After training the model, it is evaluated on the test set, constituting 10\% of the total dataset that the model has not seen during the training phase. The residuals are computed as $\sum_{i=1}^n Y_i - \hat Y_i$ 
+with $n$ the number of samples of the test set. \textbf{Fig.}~\ref{fig:all_residuals} gathers $[r, \varphi,z]$ residuals after recombination of $\varphi$ from $\sin \varphi$ and $\cos \varphi$ using \textbf{eq.} \ref{eq:atan2} and conversion from radians to degrees. \textbf{Table}~\ref{tab:rmse_metrics} gives the RMSE value for both training and testing sets.
 % For two-column wide figures use
 \begin{figure*}
 \includegraphics[width=\textwidth]{images/residuals_subplots_grouped.eps}
 % \vspace*{2cm}% Give the correct figure height in cm
-\caption{From left to right, residuals of the model predictions on the test-set for $r, \varphi$ and $\text{Z}_\text{c}$, respectively. The bottom plots show the mean value of the Y-projected bins along the X-axis, together with the standard deviation of the distribution.}
+\caption{From left to right, residuals of the model predictions on the test set for $r, \varphi$ and $\text{Z}_\text{c}$, respectively. The bottom plots show the mean value of the Y-projected bins along the X-axis, together with the standard deviation of the distribution.}
 \label{fig:all_residuals}       % Give a unique label
 \end{figure*}
 
 \begin{table}
 \centering
-\caption{Train- and test-set RMSE metrics. Units are given in mm for radius and Z, unit-less for $\sin \varphi$ and $\cos \varphi$.}
+\caption{Train- and test set RMSE metrics. Units are given in mm for radius and Z, unit-less for $\sin \varphi$ and $\cos \varphi$.}
 \label{tab:rmse_metrics}       % Give a unique label
 \begin{tabular}{lcc}
 \hline\noalign{\smallskip}
@@ -391,7 +392,7 @@ Z (mm) & 0.8147 & 1.1416 \\
 % \end{tabular}
 % \end{table}
 
-To understand how the reconstruction performs in the volume of A005, the 3D euclidean error for all points of the test-se is shown in \textbf{Fig.}~\ref{fig:3d_err_per_slice_seg}. The mean 3D euclidean error for the whole test set is $\operatorname{D}_\text{mean} = 1.88$ mm where $\operatorname{D}_\text{mean}$ is computed by switching back to euclidean coordinates.
+To understand how the reconstruction performs in the volume of A005, the 3D euclidean error for all points of the test set is shown in \textbf{Fig.}~\ref{fig:3d_err_per_slice_seg}. Switching to euclidean coordinates, the distribution of distances between true and predicted values along \textbf{X}\textsubscript{c}, \textbf{Y}\textsubscript{c} and \textbf{Z}\textsubscript{c} axes is computed and results in full-width at half-maximum (FWHM) values of 1.82, 2.87 and 1.75 mm, respectively.
 
 \begin{figure}
 \centering
@@ -400,13 +401,13 @@ To understand how the reconstruction performs in the volume of A005, the 3D eucl
 }
 % If not, use
 %\vspace{5cm}       % Give the correct figure height in cm
-\caption{Euclidean error computed on test-set samples, for all segments of A005, gathered by slice. The colored dashed vertical lines represent the mean error of each slice, reported below the slice number. Error bars show the standard deviation of each bin's error distribution. Null euclidean error is represented by the gray vertical dashed line.}
+\caption{Euclidean error computed on test set samples, for all segments of A005, gathered by slice. The colored dashed vertical lines represent the mean error of each slice, reported below the slice number. Error bars show the standard deviation of each bin's error distribution. Null euclidean error is represented by the gray vertical dashed line.}
 \label{fig:3d_err_per_slice_seg}       % Give a unique label
 \end{figure}
 
 \section{Position reconstruction}
 \label{sec:position_reconstruction}
-Using collimated beams taken with A005 in horizontal orientation on the IPHC scanning table, it is possible to test the GBRT model on unseen data with more realistic conditions. Data were taken a few months before building A005 pulses database that was used to train the model. Thus, the gains of the segments could have shifted in the meantime. In addition to fold-1 events position reconstruction, fold-2 events position reconstruction will be presented. The pulses have a lower signal-to-noise ratio and this is a more challenging evaluation of the performance of the model.
+Using collimated beams taken with A005 in horizontal orientation on the IPHC scanning table, it is possible to test the GBRT model on unseen data with more realistic conditions. Data were taken a few months before building A005 pulses database that was used to train the model. Thus, a data pre-processing was applied to ensure proper gain match on all segments and the core. In addition to fold-1 events position reconstruction, fold-2 events position reconstruction will be presented. The pulses have a lower signal-to-noise ratio and this is a more challenging evaluation of the performance of the model.
 
 Results will be presented by showing the reconstructed hit positions in different visualization planes, YX, YZ and XZ.
 
@@ -438,24 +439,21 @@ To evaluate the model's performance, a 2D gaussian fit is shown on \textbf{Fig.}
 % \end{figure}
 
 \subsection{Fold-2 events}
-For fold-2 events depositing the full incident $\gamma$-ray energy, the ordering of the interactions is uncertain as the incident gamma ray energy is over 255.5~keV. This is a result derived from the Compton kinematics. A probabilistic method, described in \textbf{Algo.} \ref{algo:compton_edge_test}, is used to assign an interaction order based on the energy deposited by the two interactions.
+For fold-2 events depositing the full incident $\gamma$-ray energy, the ordering of the interactions is uncertain as the incident gamma ray energy is over 255.5~keV. This is a result derived from the Compton kinematics. A probabilistic method, described in \ref{enum:compton_edge_test}, is used to assign an interaction order based on the energy deposited by the two interactions.
+\begin{enumerate}
+    \label{enum:compton_edge_test}
+    \item Identify the largest energy deposit between $E_1$ and $E_2$: call it $E_\text{max}$
+    \item Calculate the total energy deposited: $E_\text{tot} = E_1 + E_2$\;
+    \item Compute the Compton edge energy $E_\text{ce}$ for a scattering angle $\theta = 180^\circ$\;
+    \item if $E_\text{max} > E_\text{ce}$ then swap the order of interactions
+\end{enumerate}
 
 % \begin{enumerate}
 %     \item First hit is assigned to the highest energy deposit E\textsubscript{max} of the pair;
 %     \item Compton edge test is performed, meaning the maximum energy deposited (Compton edge energy E\textsubscript{ce}) is computed using \ensuremath{\text{E}_\text{tot} = \text{E}_1 + \text{E}_2} and a scattering angle $\theta = 180^\circ$. If E\textsubscript{max} $>$ E\textsubscript{ce}, order of interactions is inverted.
 % \end{enumerate}
 
-\begin{algorithm}[h]
-\label{algo:compton_edge_test}
-\caption{fold-2 events interactions ordering}
-Identify the largest energy deposit between $E_1$ and $E_2$: call it $E_\text{max}$\;
-Calculate the total energy deposited: $E_\text{tot} = E_1 + E_2$\;
-Compute the Compton edge energy $E_\text{ce}$ for a scattering angle $\theta = 180^\circ$\;
-\If{$E_\text{max} > E_\text{ce}$}{
-    Swap the order of interactions\;
-}
-\end{algorithm}
-
+    
 This method results in approximately 60\% of correct fold-2 events ordering at 662 keV~\cite{Piqueras2004ADetectors}.
 Pulses have a lower signal-to-noise ratio and this makes fold-2 events a robust evaluation of the performance of the GBRT model. \textbf{Fig.}~\ref{fig:H_beam_10.0_-9.0_fold2_HitIndex1_and_fold1} shows the reconstructed positions of the first interactions only from the fold-2 events, using the probabilistic ordering method described above. To limit the noise in the transient signals, data was filtered to keep fold-2 events with second hit not in the neighborhood of the first hit.
 
@@ -507,7 +505,18 @@ Theta (rad) & $-0.187(4)$ & $-0.150(6)$ \\
 \end{tabular}
 \end{table}
 
-In order to characterize the position reconstruction in the whole cristal, \textbf{Table}~\ref{tab:gauss_fit_all_slices} presents, for 3 points per slice, the gaussian fit parameters obtained for both fold-1 and -2, using the same method as in \textbf{Fig.}~\ref{fig:H_beam_10.0_-9.0_fold2_HitIndex1_and_fold1}(c) and (f), respectively. Each beam spot is taken at approximately the middle of the slices along \textbf{Z\textsubscript{c}} $(4, 14, 28, 44, 62, 80)$ mm, at three \textbf{X\textsubscript{c}} positions : $(-19, 1, 21)$ mm. This results in 18 points in the volume of the crystal. Again, for fold-2 events reconstruction, the gaussian fit is only performed on the supposed first interaction of the pair.
+In order to characterize the position reconstruction in the whole cristal, \textbf{Table}~\ref{tab:gauss_fit_all_slices} presents, for 3 points per slice and in every slice, the gaussian fit parameters obtained for both fold-1 and -2, using the same method as in \textbf{Fig.}~\ref{fig:H_beam_10.0_-9.0_fold2_HitIndex1_and_fold1}(c) and (f), respectively. Beam spots are located along \textbf{Z\textsubscript{c}} $(4, 14, 28, 44, 62, 80)$ mm, at three \textbf{X\textsubscript{c}} positions : $(-19, 1, 21)$ mm. This results in 18 points in the volume of the crystal. Again, for fold-2 events reconstruction, the gaussian fit is only performed on the supposed first interaction of the pair. All reconstructed positions are compatible with true positions within $1\sigma$ of the gaussian fit. Superposition of the beam positions and the detector are shown in \textbf{Fig.}~\ref{fig:18pts_gaussian_beam_spot}, where the true position is represented by the crossings of the dashed grid-lines.
+
+\begin{figure}
+\centering
+\resizebox{0.45\textwidth}{!}{%
+  \includegraphics{images/many_pts_across_detector.pdf}
+}
+% If not, use
+%\vspace{5cm}       % Give the correct figure height in cm
+\caption{Mean and standard deviation along X\textsubscript{c} and Z\textsubscript{c} for all 36 fitted beam spots presented in \textbf{Table}~\ref{tab:gauss_fit_all_slices}. F1 and F2 represent fold-1 (blue) and -2 (orange) events, respectively. True positions of the beam spot are at vertical and horizontal dashed grid lines crossings.}
+\label{fig:18pts_gaussian_beam_spot}       % Give a unique label
+\end{figure}
 
 
 % \begin{table*}[ht]
@@ -530,9 +539,8 @@ In order to characterize the position reconstruction in the whole cristal, \text
 % \end{tabular}
 % \end{table*}
 
-
-\begin{table*}[h]
-  \caption{Gaussian fit parameters for 3 \textbf{X\textsubscript{c}} positions $(-19, 1, 20)$ mm across all slices of the detector, along \textbf{Z\textsubscript{c}}. Positions along \textbf{Z\textsubscript{c}} are taken at the center of each slice, at coordinates $(4, 14, 28, 44, 62, 80)$ mm. Results are given for both fold-1 (\textbf{F1}) and fold-2 (\textbf{F2}) events. Fit parameters uncertainty is omitted as it is always lower than 1\% of the parameter's value.}
+\begin{table*}[ht]
+  \caption{Gaussian fit parameters for 5 \textbf{X\textsubscript{c}} positions $(-29, -19, 1, 9, 21)$ mm across all slices of the detector, along \textbf{Z\textsubscript{c}}. Positions along \textbf{Z\textsubscript{c}} are taken in each slice, at coordinates $(4, 14, 28, 44, 62, 80)$ mm. Results are given for both fold-1 (\textbf{F1}) and fold-2 (\textbf{F2}) events. Fit parameters uncertainty is omitted for the clarity of the table. A visual representation of the fit results is shown in \textbf{Fig.}~\ref{fig:18pts_gaussian_beam_spot}.}
   \label{tab:gauss_fit_all_slices}
   \centering
   \begin{threeparttable}
@@ -546,47 +554,99 @@ In order to characterize the position reconstruction in the whole cristal, \text
       \multicolumn{2}{c}{\tabhead{\makecell{Slice 5\\ {\fontsize{8pt}{9.6}\selectfont(Z\textsubscript{c} = 62 mm)}}}} & 
       \multicolumn{2}{c}{\tabhead{\makecell{Slice 6\\ {\fontsize{8pt}{9.6}\selectfont(Z\textsubscript{c} = 80 mm)}}}} \\
       \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11} \cmidrule(lr){12-13}
-      & \tabhead{F1\tnote{1}} & \tabhead{F2\tnote{2}} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} \\
+      & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} \\
       \midrule
-      \multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = 21 mm}}}}} \\
-      Amplitude          & 143.32 & 12.96  & 145.53 & 17.68  & 174.77 & 18.77 & 205.96 & 19.62 & 217.98 & 25.22 & 137.92 & 9.51 \\
-      Mean Z\textsubscript{c} (mm)      & 4.03   & 3.97   & 14.18  & 14.95  & 28.88  & 28.53 & 43.69  & 43.92 & 61.26  & 61.05 & 79.14  & 77.03 \\
-      $\sigma_Z$ (mm)    & 1.43   & 2.08   & 2.01   & 2.36   & 1.92   & 2.54  & 1.72   & 2.49  & 1.65   & 2.06  & 2.51   & 2.78 \\
-      Mean X\textsubscript{c} (mm)      & 20.60  & 20.62  & 20.71  & 20.28  & 20.24  & 19.40 & 20.46  & 19.01 & 19.98  & 18.57 & 20.25  & 19.60 \\
-      $\sigma_X$ (mm)    & 2.56   & 3.24   & 1.93   & 4.04   & 2.39   & 3.85  & 2.58   & 3.57  & 2.81   & 3.00  & 3.18   & 4.63 \\
-      % Theta (rad)        & -0.44  & -0.31  & 1.57   & -0.09  & 0.21   & 0.10  & 0.03   & -0.02 & 0.00   & 0.04  & 0.45   & 1.57 \\
-      \midrule
-      \multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = 1 mm}}}}} \\
-      Amplitude          & 264.47 & 38.17  & 125.03 & 52.91  & 215.48 & 36.09 & 283.42 & 44.23 & 344.86 & 48.57 & 203.91 & 9.66 \\
-      Mean Z\textsubscript{c} (mm)      & 3.91   & 4.88   & 15.19  & 15.12  & 29.91  & 29.44 & 44.08  & 44.40 & 61.30  & 61.52 & 78.76  & 77.68 \\
-      $\sigma_Z$ (mm)    & 1.93   & 2.10   & 1.65   & 2.76   & 2.71   & 2.68  & 1.65   & 2.02  & 1.51   & 1.87  & 2.60   & 4.47 \\
-      Mean X\textsubscript{c} (mm)      & 2.76   & 2.99   & 3.37   & 3.20   & 3.93   & 4.00  & 4.12   & 4.14  & 3.62   & 3.79  & 3.47   & 4.26 \\
-      $\sigma_X$ (mm)    & 1.86   & 2.99   & 2.99   & 1.50   & 1.80   & 2.89  & 2.33   & 2.64  & 2.04   & 2.45  & 2.03   & 4.76 \\
-      % Theta (rad)        & -1.57  & 1.26   & -0.68  & -1.57  & -1.57  & 1.57  & 0.28   & 0.09  & 0.10   & -0.02 & -0.31  & 1.57 \\
-      \midrule
-      \multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = -19 mm}}}}} \\
-      Amplitude          & 210.85 & 17.95  & 224.48 & 40.82  & 226.66 & 34.44 & 264.63 & 43.81 & 327.78 & 42.40 & 228.86 & 15.64 \\
-      Mean Z\textsubscript{c} (mm)      & 4.09   & 3.97   & 13.84  & 14.84  & 27.67  & 27.78 & 43.53  & 43.76 & 61.69  & 61.39 & 79.34  & 77.69 \\
-      $\sigma_Z$ (mm)    & 1.18   & 1.73   & 1.90   & 1.84   & 1.57   & 2.30  & 1.56   & 1.93  & 1.44   & 1.80  & 2.30   & 4.42 \\
-      Mean X\textsubscript{c} (mm)      & -17.10 & -16.94 & -17.83 & -17.13 & -16.53 & -17.54 & -17.30 & -17.26 & -16.85 & -16.55 & -17.63 & -17.41 \\
-      $\sigma_X$ (mm)    & 2.87   & 4.56   & 2.02   & 3.15   & 3.56   & 3.52  & 2.89   & 2.63  & 2.93   & 2.93  & 2.62   & 2.54 \\
-      % Theta (rad)        & 0.07   & 0.11   & -0.01  & -0.14  & 0.05   & -0.03 & 0.05   & -0.02 & -0.02  & 0.07  & 0.98   & 0.02 \\
+\multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = 21 mm}}}}} \\
+Amplitude          & 143.32 & 12.96  & 145.53 & 17.68  & 174.77 & 18.77 & 205.96 & 19.62 & 217.98 & 25.22 & 137.92 & 9.51 \\
+Mean Z\textsubscript{c} (mm)      & 4.03   & 3.97   & 14.18  & 14.95  & 28.88  & 28.53 & 43.69  & 43.92 & 61.26  & 61.05 & 79.14  & 77.03 \\
+$\sigma_Z$ (mm)    & 1.43   & 2.08   & 2.01   & 2.36   & 1.92   & 2.54  & 1.72   & 2.49  & 1.65   & 2.06  & 2.51   & 2.78 \\
+Mean X\textsubscript{c} (mm)      & 20.60  & 20.62  & 20.71  & 20.28  & 20.24  & 19.40 & 20.46  & 19.01 & 19.98  & 18.57 & 20.25  & 19.60 \\
+$\sigma_X$ (mm)    & 2.56   & 3.24   & 1.93   & 4.04   & 2.39   & 3.85  & 2.58   & 3.57  & 2.81   & 3.00  & 3.18   & 4.63 \\
+\midrule
+\multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = 9 mm}}}}} \\
+Amplitude          & 180.72 & 12.39  & 152.05 & 49.67  & 245.30 & 34.28 & 288.90 & 33.29 & 322.96 & 26.83 & 231.08 & 11.11 \\
+Mean Z\textsubscript{c} (mm)      & 3.39   & 4.13   & 14.94  & 14.63  & 29.89  & 29.14 & 43.96  & 44.14 & 61.34  & 61.33 & 78.35  & 77.16 \\
+$\sigma_Z$ (mm)    & 1.94   & 2.58   & 2.09   & 1.45   & 2.15   & 2.22  & 1.54   & 1.88  & 1.46   & 1.84  & 2.26   & 2.68 \\
+Mean X\textsubscript{c} (mm)      & 9.05   & 7.79   & 9.28   & 9.06   & 9.43   & 8.20  & 9.99   & 8.16  & 9.42   & 8.01  & 9.39   & 8.75 \\
+$\sigma_X$ (mm)    & 2.03   & 4.19   & 2.02   & 2.32   & 1.69   & 2.81  & 2.40   & 3.28  & 2.26   & 3.79  & 2.05   & 3.99 \\
+\midrule
+\multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = 1 mm}}}}} \\
+Amplitude          & 264.47 & 38.17  & 125.03 & 52.91  & 215.48 & 36.09 & 283.42 & 44.23 & 344.86 & 48.57 & 203.91 & 9.66 \\
+Mean Z\textsubscript{c} (mm)      & 3.91   & 4.88   & 15.19  & 15.12  & 29.91  & 29.44 & 44.08  & 44.40 & 61.30  & 61.52 & 78.76  & 77.68 \\
+$\sigma_Z$ (mm)    & 1.93   & 2.10   & 1.65   & 2.76   & 2.71   & 2.68  & 1.65   & 2.02  & 1.51   & 1.87  & 2.60   & 4.47 \\
+Mean X\textsubscript{c} (mm)      & 2.76   & 2.99   & 3.37   & 3.20   & 3.93   & 4.00  & 4.12   & 4.14  & 3.62   & 3.79  & 3.47   & 4.26 \\
+$\sigma_X$ (mm)    & 1.86   & 2.99   & 2.99   & 1.50   & 1.80   & 2.89  & 2.33   & 2.64  & 2.04   & 2.45  & 2.03   & 4.76 \\
+\midrule
+\multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = -19 mm}}}}} \\
+Amplitude          & 210.85 & 17.95  & 224.48 & 40.82  & 226.66 & 34.44 & 264.63 & 43.81 & 327.78 & 42.40 & 228.86 & 15.64 \\
+Mean Z\textsubscript{c} (mm)      & 4.09   & 3.97   & 13.84  & 14.84  & 27.67  & 27.78 & 43.53  & 43.76 & 61.69  & 61.39 & 79.34  & 77.69 \\
+$\sigma_Z$ (mm)    & 1.18   & 1.73   & 1.90   & 1.84   & 1.57   & 2.30  & 1.56   & 1.93  & 1.44   & 1.80  & 2.30   & 4.42 \\
+Mean X\textsubscript{c} (mm)      & -17.10 & -16.94 & -17.83 & -17.13 & -16.53 & -17.54 & -17.30 & -17.26 & -16.85 & -16.55 & -17.63 & -17.41 \\
+$\sigma_X$ (mm)    & 2.87   & 4.56   & 2.02   & 3.15   & 3.56   & 3.52  & 2.89   & 2.63  & 2.93   & 2.93  & 2.62   & 2.54 \\
+\midrule
+\multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = -29 mm}}}}} \\
+Amplitude          & 233.85 & 16.89  & 326.73 & 36.64  & 422.57 & 57.41 & 256.32 & 39.82 & 169.45 & 13.39 & 134.83 & 7.18 \\
+Mean Z\textsubscript{c} (mm)      & 3.52   & 2.76   & 14.55  & 14.41  & 27.61  & 27.89 & 42.70  & 42.69 & 61.07  & 61.24 & 78.09  & 75.00 \\
+$\sigma_Z$ (mm)    & 1.84   & 2.05   & 1.97   & 1.21   & 1.15   & 2.03  & 1.79   & 2.22  & 2.09   & 2.44  & 3.32   & 4.77 \\
+Mean X\textsubscript{c} (mm)      & -28.50 & -28.00 & -28.94 & -29.49 & -29.89 & -30.50 & -29.69 & -30.61 & -28.03 & -27.86 & -28.95 & -28.64 \\
+$\sigma_X$ (mm)    & 1.37   & 1.62   & 1.14   & 2.37   & 1.87   & 0.98  & 2.18   & 1.08  & 3.94   & 5.14  & 2.98   & 3.62 \\
+
       \bottomrule
     \end{tabular}
-    \begin{tablenotes}
-      \item[1] Fold-1
-      \item[2] Fold-2
-    \end{tablenotes}
   \end{threeparttable}
 \end{table*}
 
+% \begin{table*}[h]
+%   \caption{Gaussian fit parameters for 3 \textbf{X\textsubscript{c}} positions $(-19, 1, 21)$ mm across all slices of the detector, along \textbf{Z\textsubscript{c}}. Positions along \textbf{Z\textsubscript{c}} are taken in each slice, at coordinates $(4, 14, 28, 44, 62, 80)$ mm. Results are given for both fold-1 (\textbf{F1}) and fold-2 (\textbf{F2}) events. Fit parameters uncertainty is omitted as it is always lower than 1\% of the parameter's value.}
+%   \label{tab:gauss_fit_all_slices}
+%   \centering
+%   \begin{threeparttable}
+%     \begin{tabular}{l r r r r r r r r r r r r}
+%       \toprule
+%       \tabhead{Parameter} & 
+%       \multicolumn{2}{c}{\tabhead{\makecell{Slice 1\\ {\fontsize{8pt}{9.6}\selectfont (Z\textsubscript{c} = 4 mm)}}}} & 
+%       \multicolumn{2}{c}{\tabhead{\makecell{Slice 2\\ {\fontsize{8pt}{9.6}\selectfont(Z\textsubscript{c} = 14 mm)}}}} & 
+%       \multicolumn{2}{c}{\tabhead{\makecell{Slice 3\\ {\fontsize{8pt}{9.6}\selectfont(Z\textsubscript{c} = 28 mm)}}}} & 
+%       \multicolumn{2}{c}{\tabhead{\makecell{Slice 4\\ {\fontsize{8pt}{9.6}\selectfont(Z\textsubscript{c} = 44 mm)}}}} & 
+%       \multicolumn{2}{c}{\tabhead{\makecell{Slice 5\\ {\fontsize{8pt}{9.6}\selectfont(Z\textsubscript{c} = 62 mm)}}}} & 
+%       \multicolumn{2}{c}{\tabhead{\makecell{Slice 6\\ {\fontsize{8pt}{9.6}\selectfont(Z\textsubscript{c} = 80 mm)}}}} \\
+%       \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11} \cmidrule(lr){12-13}
+%       & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} & \tabhead{F1} & \tabhead{F2} \\
+%       \midrule
+%       \multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = 21 mm}}}}} \\
+%       Amplitude          & 143.32 & 12.96  & 145.53 & 17.68  & 174.77 & 18.77 & 205.96 & 19.62 & 217.98 & 25.22 & 137.92 & 9.51 \\
+%       Mean Z\textsubscript{c} (mm)      & 4.03   & 3.97   & 14.18  & 14.95  & 28.88  & 28.53 & 43.69  & 43.92 & 61.26  & 61.05 & 79.14  & 77.03 \\
+%       $\sigma_Z$ (mm)    & 1.43   & 2.08   & 2.01   & 2.36   & 1.92   & 2.54  & 1.72   & 2.49  & 1.65   & 2.06  & 2.51   & 2.78 \\
+%       Mean X\textsubscript{c} (mm)      & 20.60  & 20.62  & 20.71  & 20.28  & 20.24  & 19.40 & 20.46  & 19.01 & 19.98  & 18.57 & 20.25  & 19.60 \\
+%       $\sigma_X$ (mm)    & 2.56   & 3.24   & 1.93   & 4.04   & 2.39   & 3.85  & 2.58   & 3.57  & 2.81   & 3.00  & 3.18   & 4.63 \\
+%       % Theta (rad)        & -0.44  & -0.31  & 1.57   & -0.09  & 0.21   & 0.10  & 0.03   & -0.02 & 0.00   & 0.04  & 0.45   & 1.57 \\
+%       \midrule
+%       \multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = 1 mm}}}}} \\
+%       Amplitude          & 264.47 & 38.17  & 125.03 & 52.91  & 215.48 & 36.09 & 283.42 & 44.23 & 344.86 & 48.57 & 203.91 & 9.66 \\
+%       Mean Z\textsubscript{c} (mm)      & 3.91   & 4.88   & 15.19  & 15.12  & 29.91  & 29.44 & 44.08  & 44.40 & 61.30  & 61.52 & 78.76  & 77.68 \\
+%       $\sigma_Z$ (mm)    & 1.93   & 2.10   & 1.65   & 2.76   & 2.71   & 2.68  & 1.65   & 2.02  & 1.51   & 1.87  & 2.60   & 4.47 \\
+%       Mean X\textsubscript{c} (mm)      & 2.76   & 2.99   & 3.37   & 3.20   & 3.93   & 4.00  & 4.12   & 4.14  & 3.62   & 3.79  & 3.47   & 4.26 \\
+%       $\sigma_X$ (mm)    & 1.86   & 2.99   & 2.99   & 1.50   & 1.80   & 2.89  & 2.33   & 2.64  & 2.04   & 2.45  & 2.03   & 4.76 \\
+%       % Theta (rad)        & -1.57  & 1.26   & -0.68  & -1.57  & -1.57  & 1.57  & 0.28   & 0.09  & 0.10   & -0.02 & -0.31  & 1.57 \\
+%       \midrule
+%       \multirow{6}{*}{\makebox[-3.5em]{\rotatebox{90}{\centering {\fontsize{8pt}{9.6}\selectfont \textbf{Xc = -19 mm}}}}} \\
+%       Amplitude          & 210.85 & 17.95  & 224.48 & 40.82  & 226.66 & 34.44 & 264.63 & 43.81 & 327.78 & 42.40 & 228.86 & 15.64 \\
+%       Mean Z\textsubscript{c} (mm)      & 4.09   & 3.97   & 13.84  & 14.84  & 27.67  & 27.78 & 43.53  & 43.76 & 61.69  & 61.39 & 79.34  & 77.69 \\
+%       $\sigma_Z$ (mm)    & 1.18   & 1.73   & 1.90   & 1.84   & 1.57   & 2.30  & 1.56   & 1.93  & 1.44   & 1.80  & 2.30   & 4.42 \\
+%       Mean X\textsubscript{c} (mm)      & -17.10 & -16.94 & -17.83 & -17.13 & -16.53 & -17.54 & -17.30 & -17.26 & -16.85 & -16.55 & -17.63 & -17.41 \\
+%       $\sigma_X$ (mm)    & 2.87   & 4.56   & 2.02   & 3.15   & 3.56   & 3.52  & 2.89   & 2.63  & 2.93   & 2.93  & 2.62   & 2.54 \\
+%       % Theta (rad)        & 0.07   & 0.11   & -0.01  & -0.14  & 0.05   & -0.03 & 0.05   & -0.02 & -0.02  & 0.07  & 0.98   & 0.02 \\
+%       \bottomrule
+%     \end{tabular}
+%   \end{threeparttable}
+% \end{table*}
+
+
 \section{Conclusion}
-Training an ensemble machine learning model on features extracted from pulses recorded on an AGATA detector, this work shows that a millimetric position reconstruction is possible by using features extracted from the pulses, without the use of grid-search or adaptative grid-search algorithms.
+Training an ensemble machine learning model on features extracted from pulses recorded on an AGATA detector, this work shows that a millimetric-scale position reconstruction is possible by using features extracted from the pulses, without the use of grid-search or adaptative grid-search algorithms. Prediction of 33000 interaction positions took approximately 1.2 s on a high-end laptop running a i7-12800H CPU at 3.7 GHz maximum frequency, with 32 GB of RAM, resulting in a single-prediction time of the order of tens of \textmu s.
 
-Models were combined and tested on the test-set, resulting in a 3D euclidean error of 1.88 mm. Their performance was also evaluated on a collimated beam of 662~keV $\gamma$ rays from a $^{137}$Cs source, both for fold-1 and -2 events with full~-energy deposition, showing robustness of the method with features extracted from noisy pulses compared to what the model was trained with. Fold-2 reconstruction enables performing Compton imaging using this method.
+Models were combined and tested on the test-set, resulting in a FWHM of 1.82, 2.87 and 1.75 mm in \textbf{X}\textsubscript{c}, \textbf{Y}\textsubscript{c} and \textbf{Z}\textsubscript{c} coordinates, respectively. Their performance was also evaluated on a collimated beam of 662~keV $\gamma$ rays from a $^{137}$Cs source, both for fold-1 and -2 events with full-energy deposition, showing robustness of the method even with features extracted from noisy pulses compared to what the model was trained with. Fold-2 reconstruction enables performing Compton imaging using this method with a single segmented HPGe detector.
 
-The parameter $\varphi$ was reconstructed from two independent models, the correctness of the identity \ensuremath{\sin^2 \varphi + \cos^2 \varphi = 1} was not enforced. While this is a limitation of current approach, this does not seem to prevent a correct hit azimuthal position reconstruction.
-Further research could also focus on optimizing the feature set and exploring alternative machine learning architectures, such as neural networks.
 %
 % For two-column wide figures use
 % \begin{figure*}
@@ -602,7 +662,7 @@ Further research could also focus on optimizing the feature set and exploring al
 % For tables use
 \section{Acknowledgements}
 \label{sec:acknowledgements}
-The authors are grateful for the important technical contributions of M.-H. Sigward, M. Filliger and F. Didierjean. The authors acknowledge support from Région Grand-Est and MIRION Technologies CANBERRA, Contracts N$^\circ$\,252911 and 260587, respectively.
+The authors are grateful for the important technical contributions of M.-H. Sigward, M. Filliger and F. Didierjean. The authors acknowledge support from Région Grand-Est and MIRION Technologies (Canberra) SAS, Contracts N$^\circ$\,252911 and 260587, respectively.
 
 % \clearpage
 \FloatBarrier
