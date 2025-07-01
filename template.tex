@@ -86,7 +86,7 @@ Pulse-shape analysis (PSA) techniques are widely used with segmented HPGe detect
 %
 \section{Introduction}
 \label{sec:intro}
-In state-of-the-art HPGe segmented detectors, such as in international collaborations Advanced GAmma Tracking Array (AGATA)~\cite{Akkoyun2012} and Gamma-Ray Energy Tracking Array (GRETA)~\cite{Lee2003DevelopmentsArrays}, the interaction position of the $\gamma$-ray can be determined from the signal pulse in the hit segment and transient pulses in the neighbouring segments (see \textbf{Fig.}~\ref{fig:a005_geometry} for AGATA segmentation pattern). The $\gamma$-ray interaction positions and energy deposits are used by tracking algorithms~\cite{Bazzacco:2004nnw,Lopez-Martens2004}  to determine the Compton sequencing of the photon inside the detector. The approach followed by the AGATA collaboration was so far to simulate, using the AGATA Data Library (ADL)~\cite{Bruyneel2016ADL}, a basis of pulses associated to positions on a 2~mm Cartesian grid in the 3D volume of the germanium detector. The experimentally measured signal is then compared to the basis to determine the interaction position.
+State-of-the-art HPGe segmented detectors, such as in international collaborations Advanced GAmma Tracking Array (AGATA)~\cite{Akkoyun2012} and Gamma-Ray Energy Tracking Array (GRETA)~\cite{Lee2003DevelopmentsArrays}, are designed to provide the interaction position of the $\gamma$-ray from the signal pulse in the hit segment and transient pulses in the neighbouring segments (see \textbf{Fig.}~\ref{fig:a005_geometry} for AGATA segmentation pattern) up to a millimetric position resolution. The $\gamma$-ray interaction positions and energy deposits are used by tracking algorithms~\cite{Bazzacco:2004nnw,Lopez-Martens2004}  to determine the Compton sequencing of the photon inside the detector. The approach followed by the AGATA collaboration was so far to simulate, using the AGATA Data Library (ADL)~\cite{Bruyneel2016ADL}, a basis of pulses associated to positions on a 2~mm Cartesian grid in the 3D volume of the germanium detector. The experimentally measured signal is then compared to the basis to determine the interaction position.
 
 The present work uses a 3D scanned basis built with data from the IPHC scanning table and the Pulse-Shape Comparison Scan (PSCS) method~\cite{Crespi2008}. Instead of comparing the super-pulses, the approach presented in this paper uses a subset of features extracted from the pulses to locate the $\gamma$-ray interaction. Multiple gradient boosting models are trained on the features of the scanned 3D basis and takes as inputs features from measured pulses, to predict the interaction position.
 
@@ -105,9 +105,9 @@ The dataset used in this work was generated from the IPHC scanning table, that u
 \label{fig:a005_geometry}
 \end{figure}
 
-Both scans were calibrated and gain matched to ensure pulses of both scans could be compared with $\chi^2$ minimization method, see~\cite{DeCanditiis2020SimulationsDetector} for details. A gate of 3 keV around the 661.7 keV photoelectric peak of $^{137}$Cs was applied to compare full-energy deposition pulses. Due to the position sensitivity of HPGe detectors, pulses will differ between vertical and horizontal scans except at crossing points. Crossing both scan grids allows to reconstruct a pulse for all 36 segments of the detector and the core contact, at 47 000 positions. 
+Both scans were calibrated and gain matched to ensure a meaningful comparison with $\chi^2$ minimization method, see~\cite{DeCanditiis2020SimulationsDetector} for details. A gate of 3 keV around the 661.7 keV photoelectric peak of $^{137}$Cs was applied to compare full-energy deposition pulses. Due to the position sensitivity of HPGe detectors, pulse-shapes will differ between vertical and horizontal scans except at crossing points. Crossing both scan grids allows to reconstruct a pulse for all 36 segments of the detector and the core contact, at 47~000 positions. 
 
-The pitch of both scans being 2~mm results in an equally 2~mm spaced points in the 3D basis, along all cartesian axes.
+The 2~mm pitch of both scans results in an equally spaced grid with the same pitch in the 3D basis, along all cartesian axes.
 
 % In this work, all 36 segments are referenced by a segment ID. \textbf{Table}~\ref{tab:segment_mapping} maps segment ID to the conventional AGATA notation using sector labels from A to F and slice numbers from 1 to 6. Note that the core is assigned to ID = 0.
 
@@ -144,7 +144,7 @@ The pitch of both scans being 2~mm results in an equally 2~mm spaced points in t
 
 Instead of utilizing a performant but computationally intensive grid-search algorithm (or the adaptative grid-search algorithm) as used in AGATA~\cite{Venturelli2004}, relevant features are extracted from the pulses of the hit segment, its four closest neighbors (top, down, left and right) and the core, providing the model enough information on the position of the interaction in the detector volume. The aim is to use a lighter Pulse Shape Analysis (PSA) method, to allow usage of the model on an embedded software. Given the quasi-rotational symmetry of A005 (the crystal is asymmetric), a cylindrical coordinate system $(r, \varphi, z)$ is adopted.
 
-The first feature that is used is the segment ID of the hit segment (named \textit{SegID}). A005 having 36 segments, this information alone refines the position to a few cm$^3$. To bring additional depth information, the slice number (named \textit{SliceID}) illustrated in \textbf{Fig.}~\ref{fig:a005_geometry}(a) is also used as a feature.
+The first feature that is used is the segment ID of the hit segment (named \textit{SegID}). A005 having 36 segments, this information alone refines the position to a few cubic centimeters. To bring additional depth information, the slice number (named \textit{SliceID}) illustrated in \textbf{Fig.}~\ref{fig:a005_geometry}(a) is also used as a feature.
 
 \begin{figure}
 \centering
@@ -156,7 +156,10 @@ The first feature that is used is the segment ID of the hit segment (named \text
 \end{figure}
 
 \subsubsection{Radial ($r$) related features}
-The rise-time feature of a pulse correlates with the radius of the interaction position. It corresponds to the time taken by a pulse to go from 10\% to $x$\% (denoted as T$^{x}_{10}$) of its total amplitude, $x$ being an arbitrary amplitude value. It derives from the charge carriers drift time in the detector, directly linked to the radius of the interaction in a coaxial detector such as A005. The evolution of the pulse shape of the hit segment and its four closest neighbors is depicted in \textbf{Fig.}~\ref{fig:neighbors_Ycst}. Both T$^{30}_{10}$ and T$^{90}_{10}$ are used as features in this work (see \textbf{Fig.}~\ref{fig:pulse_t30_t90}a), as they give complementary information about the interaction radius.
+% NEW
+The rise-time feature of a pulse correlates with the radius of the interaction position. It derives from the charge carriers drift time in the detector, directly linked to the radius of the interaction in a coaxial detector such as A005. The evolution of the pulse shape of the hit segment and its four closest neighbors is depicted in \textbf{Fig.}~\ref{fig:neighbors_Ycst}. One way to assess the rise-time of a pulse is to measure the time difference between 10\% and 90\%. This is usually denoted as T$^{90}_{10}$. In this work, the T$^{30}_{10}$ is also used (see \textbf{Fig.} \ref{fig:pulse_t30_t90}a).
+% OLD
+% The rise-time feature of a pulse correlates with the radius of the interaction position. It corresponds to the time taken by a pulse to go from 10\% to $x$\% (denoted as T$^{x}_{10}$) of its total amplitude, $x$ being an arbitrary amplitude value. It derives from the charge carriers drift time in the detector, directly linked to the radius of the interaction in a coaxial detector such as A005. The evolution of the pulse shape of the hit segment and its four closest neighbors is depicted in \textbf{Fig.}~\ref{fig:neighbors_Ycst}. Both T$^{30}_{10}$ and T$^{90}_{10}$ are used as features in this work (see \textbf{Fig.}~\ref{fig:pulse_t30_t90}a), as they give complementary information about the interaction radius.
 The time at which the derivative of the hit-segment's pulse reaches its maximum (named \textit{MaxDerivTime}) is also correlated to the radius of the interaction, it is thus used as an input for the model (\textbf{Fig.}~\ref{fig:pulse_t30_t90}b).
 
 \subsubsection{Azimuthal angle ($\varphi$) related features}
@@ -172,7 +175,7 @@ of A005 detector, along X-axis, in segment A5. The hit positions shown have a ra
 \label{fig:neighbor_signals_RadCst}
 \end{figure}
 
-The absolute integral is the sum of the absolute values of the 120 samples of a pulse. Features computed using this method are named \textit{Up-}, \textit{Down-}, \textit{Left-} and \textit{Right-} integrals. Similarly, polarity of the transient signals can be integrated in the model by summing samples without using their absolute value. The polarity can help refine the radius of the interaction, as seen in \textbf{Fig.}~\ref{fig:neighbors_Ycst} with the polarity inversion occurring as $r$ grows. These features are called \textit{Up-}, \textit{Down-}, \textit{Left-} and \textit{Right-Polarity} in subsequent figures.
+The absolute integral is the sum of the absolute values of the 120 samples of a pulse. Features computed using this method are named \textit{Up-}, \textit{Down-}, \textit{Left-} and \textit{Right-} integrals. Similarly, polarity of the transient signals is integrated in the model by summing samples without using their absolute value. The polarity helps refine the radius of the interaction, as seen in \textbf{Fig.}~\ref{fig:neighbors_Ycst} with the polarity inversion occurring as $r$ grows. These features are called \textit{Up-}, \textit{Down-}, \textit{Left-} and \textit{Right-Polarity} in subsequent figures.
 
 \subsubsection{Depth ($z$) related features}
 The depth of the interaction within the crystal, following the $z$ coordinate, can be refined through the use of the transient signals of the bottom and top neighbours (see \textbf{Fig.}~\ref{fig:neighbors_Ycst}). Similarly, both the magnitude and the polarity are taken into account for those signals.
@@ -240,16 +243,17 @@ To address this issue, $\varphi$ is encoded into two components, $\sin \varphi$ 
 \end{equation}
 where $\operatorname{arctan}_2$ is a modified $\arctan$ function that returns values in $[-\pi, \pi]$ instead of $[-\frac{\pi}{2}, \frac{\pi}{2}]$, covering all four quadrants of the unit circle. The result can then be adjusted to the original range $[0, 2\pi]$ of the $\varphi$ angle.
 
-In total, four separate models are trained on of 90\% of the A005 pulses database. The 10\% left constitute the test dataset that is used to evaluate the model's performance on unseen data, after training.
+In total, four separate models are trained on 90\% of the A005 pulses database. The 10\% left constitute the test dataset that is used to evaluate the model's performance on unseen data, after training.
 
-\textbf{Fig.}~\ref{fig:corr_matrix} shows the Pearson correlation coefficients for all pairs of variables (features and targets). It allows to capture the linear relationship between two variables. If one of the two variables is a target of the model, the higher the coefficient the more the feature will help having a good model. If the two compared variables are features, a higher (or lower) coefficient indicates that both variables will bring similar information to the model, and using only one could be best. Pearson's correlation coefficient between two variables X and Y is computed using:
+% \textbf{Fig.}~\ref{fig:corr_matrix} shows the 
+Pearson correlation coefficients for all pairs of variables (features and targets) are used to evaluate the linear relationship between two variables. They are shown in \textbf{Fig.} 6. If one of the two variables is a target of the model, the higher the coefficient the more the associated feature will help having a better model. If the two compared variables are features, a higher (or lower) coefficient indicates that both variables will bring similar information to the model, and using only one could be best. Given two variables X and Y (feature or target), the Pearson's correlation coefficient is computed using:
 
 \begin{equation}
     \rho_{X,Y}={\frac {\operatorname {cov} (X,Y)}{\sigma _{X}\sigma _{Y}}},
 \end{equation}
 
-where $\operatorname{cov}$ is the covariance, $\sigma_X$ and $\sigma_Y$ are the standard deviations of the X and Y variables, respectively.
-Using an ensemble model has for objective to model non-linear phenomena, as is the position-dependence of the pulses shapes. Thus, even though some features have linear correlation coefficients near 0 with targets, this does not rule out non-linear correlations.
+\noindent where $\operatorname{cov}$ is the covariance, $\sigma_X$ and $\sigma_Y$ are the standard deviations of the X and Y variables, respectively.
+Using an ensemble model has for objective to model non-linear phenomena, as is the position-dependence of the pulses shapes. Thus, even though some features have near 0 linear correlation coefficients with targets, this does not rule out non-linear correlations.
 
 \begin{figure}
 \centering
@@ -268,7 +272,7 @@ An early-stopping criterion is used to stop the training after 10 new trees with
 \begin{figure}[ht]
 \centering
 \resizebox{0.48\textwidth}{!}{%
-  \includegraphics{images/gbdt_losses.eps}
+  \includegraphics{images/gbdt_losses.pdf}
 }
 % If not, use
 %\vspace{5cm}       % Give the correct figure height in cm
@@ -364,7 +368,7 @@ with $n$ the number of samples of the test set. \textbf{Fig.}~\ref{fig:all_resid
 
 \begin{table}
 \centering
-\caption{Train- and test set RMSE metrics. Units are given in mm for radius and Z, unit-less for $\sin \varphi$ and $\cos \varphi$.}
+\caption{Train- and test set RMSE metrics.}
 \label{tab:rmse_metrics}       % Give a unique label
 \begin{tabular}{lcc}
 \hline\noalign{\smallskip}
@@ -396,18 +400,18 @@ To understand how the reconstruction performs in the volume of A005, the 3D eucl
 
 \begin{figure}
 \centering
-\resizebox{0.30\textwidth}{!}{%
-  \includegraphics{images/slice_err_cblind.eps}
+\resizebox{0.35\textwidth}{!}{%
+  \includegraphics{images/err_per_slice.pdf}
 }
 % If not, use
 %\vspace{5cm}       % Give the correct figure height in cm
-\caption{Euclidean error computed on test set samples, for all segments of A005, gathered by slice. The colored dashed vertical lines represent the mean error of each slice, reported below the slice number. Error bars show the standard deviation of each bin's error distribution. Null euclidean error is represented by the gray vertical dashed line.}
+\caption{Euclidean error computed on test set samples, for all segments of A005, gathered by slice. The colored triangles at the side of each slice represent the mean error of each slice, whose value is reported below the slice number. The mean error of each segment is depicted by the red diamond and the median error by the vertical black line inside the boxes. The box represents the interquartile range (IQR) from Q1 to Q3, containing 50\% of the points, and the whiskers range from $\text{Q1} + 1.5 * \text{IQR}$ to $\text{Q3} + 1.5 * \text{IQR}$. Null euclidean error is represented by the gray vertical dashed line.}
 \label{fig:3d_err_per_slice_seg}       % Give a unique label
 \end{figure}
 
 \section{Position reconstruction}
 \label{sec:position_reconstruction}
-Using collimated beams taken with A005 in horizontal orientation on the IPHC scanning table, it is possible to test the GBRT model on unseen data with more realistic conditions. Data were taken a few months before building A005 pulses database that was used to train the model. Thus, a data pre-processing was applied to ensure proper gain match on all segments and the core. In addition to fold-1 events position reconstruction, fold-2 events position reconstruction will be presented. The pulses have a lower signal-to-noise ratio and this is a more challenging evaluation of the performance of the model.
+Using collimated beams taken with A005 in horizontal orientation on the IPHC scanning table, it is possible to test the GBRT model on unseen data with more realistic conditions. Data were taken a few months before building A005 pulses database that was used to train the model. Thus, a data pre-processing was applied to ensure proper gain match on all segments and the core. In addition to fold-1 events, fold-2 events position reconstruction will be presented. The pulses have a lower signal-to-noise ratio and this is a more challenging evaluation of the performance of the model.
 
 Results will be presented by showing the reconstructed hit positions in different visualization planes, YX, YZ and XZ.
 
@@ -455,7 +459,8 @@ For fold-2 events depositing the full incident $\gamma$-ray energy, the ordering
 
     
 This method results in approximately 60\% of correct fold-2 events ordering at 662 keV~\cite{Piqueras2004ADetectors}.
-Pulses have a lower signal-to-noise ratio and this makes fold-2 events a robust evaluation of the performance of the GBRT model. \textbf{Fig.}~\ref{fig:H_beam_10.0_-9.0_fold2_HitIndex1_and_fold1} shows the reconstructed positions of the first interactions only from the fold-2 events, using the probabilistic ordering method described above. To limit the noise in the transient signals, data was filtered to keep fold-2 events with second hit not in the neighborhood of the first hit.
+Pulses have a lower signal-to-noise ratio and this makes fold-2 events a robust evaluation of the performance of the GBRT model. %\textbf{Fig.}~\ref{fig:H_beam_10.0_-9.0_fold2_HitIndex1_and_fold1} shows 
+The reconstructed positions of the first interactions only from the fold-2 events, using the aforementioned probabilistic ordering method are illustrated in \textbf{Fig.}~\ref{fig:H_beam_10.0_-9.0_fold2_HitIndex1_and_fold1}. To limit the noise in the transient signals, only non-contiguous segments were considered in the case of fold-2 events.
 
 %\underline{Collimated beam at (Z\textsubscript{c},Y\textsubscript{c}) = (10, -9) mm}\\
 
@@ -470,7 +475,7 @@ Pulses have a lower signal-to-noise ratio and this makes fold-2 events a robust 
 \begin{figure*}[htb]
 \includegraphics[width=\textwidth]{images/superimposed_D10,0_-9,0_fold2_HitIndex1_AND_fold1_3subplots_with_fit.pdf}
 % \vspace*{2cm}% Give the correct figure height in cm
-     \caption{\textbf{(a)} YZ-plane representation of the interactions along the collimated $\gamma$-ray beam. \textbf{(b)} YX-plane representation of the interactions along the collimated $\gamma$-ray beam. In \textbf{(a)} and \textbf{(b)}, the magenta arrows represent the position and direction of the collimated beam. \textbf{(c)} XZ-plane representation of the collimated beam. Magenta star represents the position of the beam, seen from above. Red contours from the 2D gaussian fit are shown inside inserts zooming on the beam spot, in \textbf{(c)} and \textbf{(f)}. \textbf{(a)}, \textbf{(b)} and \textbf{(c)} show the fold-1 reconstructed positions. \textbf{(d)}, \textbf{(e)} and \textbf{(f)} show the first-hit reconstructed position of fold-2 events. All color scales are logarithmic.}
+     \caption{\textbf{(a)} YZ-plane representation of the interactions along the collimated $\gamma$-ray beam, \textbf{(b)}Same plot for the YX-plane. \textbf{(c)} Same plot for the XZ-plane. In \textbf{(a)} and \textbf{(b)}, the magenta arrows represent the position and direction of the collimated beam. The star in magenta represents the position of the beam, seen from above. Red contours from the 2D gaussian fit are shown inside inserts zooming on the beam spot, in \textbf{(c)} and \textbf{(f)}. Figures \textbf{(a)}, \textbf{(b)} and \textbf{(c)} show the fold-1 reconstructed positions, while figures \textbf{(d)}, \textbf{(e)} and \textbf{(f)} show the first-hit reconstructed position of fold-2 events. All color scales are logarithmic.}
 \label{fig:H_beam_10.0_-9.0_fold2_HitIndex1_and_fold1}       % Give a unique label
 \end{figure*}
 
@@ -489,7 +494,7 @@ The results of the 2D gaussian fit for both fold-1 and fold-2 events reconstruct
 
 \begin{table}[ht]
 \centering
-\caption{2D Gaussian fit results for full-energy deposition fold-1 and fold-2 events reconstruction in the ZX-plane. The $\gamma$-ray beam is located at $(\text{Z}_\text{c}, \text{X}_\text{c}) = (10\pm0.02, -9\pm0.02)$. Fit values are given with their uncertainties in parenthesis notation. Theta corresponds to the rotation of the Gaussian.}
+\caption{2D Gaussian fit results for full-energy deposition fold-1 and fold-2 events reconstruction in the ZX-plane. The $\gamma$-ray beam is located at $(\text{Z}_\text{c}, \text{X}_\text{c}) = (10\pm0.02, -9\pm0.02)$. Fit parameters are given with their uncertainties in parenthesis notation. Theta corresponds to the rotation of the Gaussian in the ZX-plane.}
 \label{tab:gaussian_fit_results_combined}
 \begin{tabular}{lrr}
 \hline\noalign{\smallskip}
@@ -505,7 +510,7 @@ Theta (rad) & $-0.187(4)$ & $-0.150(6)$ \\
 \end{tabular}
 \end{table}
 
-In order to characterize the position reconstruction in the whole cristal, \textbf{Table}~\ref{tab:gauss_fit_all_slices} presents, for 3 points per slice and in every slice, the gaussian fit parameters obtained for both fold-1 and -2, using the same method as in \textbf{Fig.}~\ref{fig:H_beam_10.0_-9.0_fold2_HitIndex1_and_fold1}(c) and (f), respectively. Beam spots are located along \textbf{Z\textsubscript{c}} $(4, 14, 28, 44, 62, 80)$ mm, at three \textbf{X\textsubscript{c}} positions : $(-19, 1, 21)$ mm. This results in 18 points in the volume of the crystal. Again, for fold-2 events reconstruction, the gaussian fit is only performed on the supposed first interaction of the pair. All reconstructed positions are compatible with true positions within $1\sigma$ of the gaussian fit. Superposition of the beam positions and the detector are shown in \textbf{Fig.}~\ref{fig:18pts_gaussian_beam_spot}, where the true position is represented by the crossings of the dashed grid-lines.
+In order to characterize the position reconstruction in the whole cristal, \textbf{Table}~\ref{tab:gauss_fit_all_slices} presents, for 3 points per slice and in every slice, the gaussian fit parameters obtained for both fold-1 and -2, using the same method as in \textbf{Fig.}~\ref{fig:H_beam_10.0_-9.0_fold2_HitIndex1_and_fold1}(c) and (f), respectively. Beam spots are located along \textbf{Z\textsubscript{c}} $(4, 14, 28, 44, 62, 80)$ mm, at three \textbf{X\textsubscript{c}} positions : $(-19, 1, 21)$ mm. This results in 18 points in the volume of the crystal. For fold-2 events reconstruction, the gaussian fit is only performed on the supposed first interaction of the pair. All reconstructed positions are compatible with true positions within $1\sigma$ of the gaussian fit. Superposition of the beam positions and the detector are shown in \textbf{Fig.}~\ref{fig:18pts_gaussian_beam_spot}, where the true position is represented by the crossings of the dashed grid-lines, denoted as magenta points.
 
 \begin{figure}
 \centering
@@ -514,7 +519,7 @@ In order to characterize the position reconstruction in the whole cristal, \text
 }
 % If not, use
 %\vspace{5cm}       % Give the correct figure height in cm
-\caption{Mean and standard deviation along X\textsubscript{c} and Z\textsubscript{c} for all 36 fitted beam spots presented in \textbf{Table}~\ref{tab:gauss_fit_all_slices}. F1 and F2 represent fold-1 (blue) and -2 (orange) events, respectively. True positions of the beam spot are at vertical and horizontal dashed grid lines crossings.}
+\caption{Mean and standard deviation along X\textsubscript{c} and Z\textsubscript{c} for all 36 fitted beam spots presented in \textbf{Table}~\ref{tab:gauss_fit_all_slices}. F1 and F2 represent fold-1 (blue) and -2 (orange) events, respectively. True positions of the beam spot are at vertical and horizontal dashed grid lines crossings denoted by magenta spots.}
 \label{fig:18pts_gaussian_beam_spot}       % Give a unique label
 \end{figure}
 
@@ -643,9 +648,9 @@ $\sigma_X$ (mm)    & 1.37   & 1.62   & 1.14   & 2.37   & 1.87   & 0.98  & 2.18  
 
 
 \section{Conclusion}
-Training an ensemble machine learning model on features extracted from pulses recorded on an AGATA detector, this work shows that a millimetric-scale position reconstruction is possible by using features extracted from the pulses, without the use of grid-search or adaptative grid-search algorithms. Prediction of 33000 interaction positions took approximately 1.2 s on a high-end laptop running a i7-12800H CPU at 3.7 GHz maximum frequency, with 32 GB of RAM, resulting in a single-prediction time of the order of tens of \textmu s.
+Training an ensemble machine learning model on features extracted from pulses, obtained from an AGATA detector, shows that a millimetric-scale position reconstruction is possible by using features extracted from the pulses, without the use of grid-search or adaptative grid-search algorithms. Prediction of 33000 interaction positions took approximately 1.2 s on a high-end laptop running a i7-12800H CPU at 3.7 GHz maximum frequency, with 32 GB of RAM, resulting in a single-prediction time of the order of tens of \textmu s.
 
-Models were combined and tested on the test-set, resulting in a FWHM of 1.82, 2.87 and 1.75 mm in \textbf{X}\textsubscript{c}, \textbf{Y}\textsubscript{c} and \textbf{Z}\textsubscript{c} coordinates, respectively. Their performance was also evaluated on a collimated beam of 662~keV $\gamma$ rays from a $^{137}$Cs source, both for fold-1 and -2 events with full-energy deposition, showing robustness of the method even with features extracted from noisy pulses compared to what the model was trained with. Fold-2 reconstruction enables performing Compton imaging using this method with a single segmented HPGe detector.
+Models were combined and evaluated on the test-set, resulting in a FWHM of 1.82, 2.87 and 1.75 mm in \textbf{X}\textsubscript{c}, \textbf{Y}\textsubscript{c} and \textbf{Z}\textsubscript{c} coordinates, respectively. Their performance was also evaluated on a collimated beam of 662~keV $\gamma$ rays from a $^{137}$Cs source, both for fold-1 and -2 events with full-energy deposition, demonstrating the robustness of the method even with features extracted from noisy pulses compared to what the model was trained with. Fold-2 reconstruction enables performing Compton imaging using this method with a single segmented HPGe detector.
 
 %
 % For two-column wide figures use
